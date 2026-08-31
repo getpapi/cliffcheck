@@ -1,0 +1,561 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Colors — CliffCheck canon: warm stone/amber + chart-zone semantics.
+     GENERATED — do not edit between the markers. Edit CANON in lib/palette.ts
+     and run `npm run gen:palette`. CI (`palette:check`) fails on drift. */
+  /* @palette:root start */
+  /* CliffCheck canon — warm stone/amber + chart-zone semantics (DESIGN.md) */
+  /* Surfaces */
+  --color-warm-white: #FAFAF9;  /* page background */
+  --color-surface-white: #FFFFFF;  /* cards, inputs */
+  --color-surface-cream: #FFF7ED;  /* result cards, manager brief */
+  --color-trust-surface: #F5F5F4;  /* header, trust badge, summary strip */
+  --color-border-stone: #D6D3D1;  /* card edges, dividers, input borders */
+  --color-border-strong: #A8A29E;  /* hero band, header bottom, structural rules */
+  /* Brand — the signal colour */
+  --color-brand-amber: #F59E0B;  /* primary buttons, active states, focus rings */
+  --color-cta-hover-amber: #D97706;  /* button hover; chart transition zones */
+  /* Text — never pure black */
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #44403C;
+  --color-text-muted: #57534E;
+  /* Financial semantics — green safe, red cliff (never decorative) */
+  --color-safe-green: #16A34A;
+  --color-cliff-red: #DC2626;
+  --color-positive-delta: #15803D;  /* "+$X" text — darker green for contrast */
+  --color-negative-delta: #B91C1C;  /* "−$X" text — darker red for contrast */
+  /* Chart markers — reserved, single-use */
+  --color-current-income-blue: #2563EB;  /* "You are here" marker ONLY */
+  --color-offered-income-violet: #7C3AED;  /* "Offer" marker ONLY */
+  /* Chart zone fills + line */
+  --color-chart-safe-fill: #DCFCE7;
+  --color-chart-cliff-fill: #FEF2F2;
+  --color-chart-transition-fill: #FFFBEB;
+  --color-chart-line: #44403C;  /* primary effective-income line, no smoothing */
+  /* Card backgrounds */
+  --color-cliff-alert-bg: #FEF2F2;
+  --color-safe-exit-bg: #F0FDF4;
+  /* Soft tinted borders + accents */
+  --color-cliff-border-soft: #FCA5A5;  /* border/dividers on cliff-tinted cards */
+  --color-safe-border-soft: #86EFAC;  /* border on safe-tinted cards */
+  --color-amber-badge-bg: #FDE68A;  /* numbered step chips, logo mark frame */
+  --color-amber-badge-text: #92400E;  /* text inside amber badge chips */
+  --color-chart-wages-ghost: #C9C4BE;  /* dashed wages-only reference line */
+  /* Program composition fills — "Where the money goes" stacked view */
+  --color-program-snap: #B45309;  /* SNAP */
+  --color-program-medicaid: #0D9488;  /* Medicaid */
+  --color-program-childcare: #DB2777;  /* childcare subsidy */
+  --color-program-eitc: #65A30D;  /* EITC */
+  --color-program-aca-csr: #0891B2;  /* ACA savings (CSR) */
+  --color-program-section8: #78350F;  /* Section 8 */
+  /* @palette:root end */
+
+  /* Spacing (4px base grid — DESIGN.md) */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 40px;
+
+  /* Radius (DESIGN.md) */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;  /* cards */
+
+  /* Typography — system stack only. No custom font loading: target users are
+     on cheap Android phones with variable font rendering (DESIGN.md rule). */
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --type-display: clamp(2.5rem, 5vw, 3.5rem);  /* hero/result numbers */
+  --type-heading: 18px;
+  --type-subheading: 14px;
+  --type-body: 14px;
+  --type-caption: 12px;
+
+  /* Motion + elevation tokens.
+     GENERATED — do not edit between the markers. Edit globalsMotion in
+     lib/palette.ts and run `npm run gen:palette`. CI (`palette:check`) fails on
+     drift. Marketing-surface depth/motion (DESIGN-DIRECTION.md §8/§9); the tool
+     surface stays flat per DESIGN.md. */
+  /* @palette:motion start */
+  /* Motion + elevation — DESIGN-DIRECTION.md §8/§9 + DESIGN.md tool depth */
+  /* Motion durations */
+  --motion-fast: 160ms;  /* hover/press micro-interactions */
+  --motion-base: 240ms;  /* scroll-reveal entrances, card transitions */
+  --motion-slow: 480ms;  /* rotating hero crossfade */
+  /* Easing curves */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);  /* confident settle */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Elevation — warm-tinted, two steps: resting card, raised hero */
+  /* Round-2: deepened — cards must visibly lift off the cream page */
+  --elevation-card: 0 1px 2px rgba(28, 25, 23, 0.07), 0 3px 12px -3px rgba(28, 25, 23, 0.10);  /* every resting card */
+  --elevation-raised: 0 2px 4px rgba(28, 25, 23, 0.08), 0 18px 44px -14px rgba(28, 25, 23, 0.30);  /* the answer band (one per page) */
+  --elevation-float: 0 8px 30px rgba(28, 25, 23, 0.09);  /* hover lift */
+  /* @palette:motion end */
+  /* ── shadcn/ui semantic theme, wired to the CliffCheck canon above.
+     Light-only on purpose (warm-light is the brand; no dark mode). Every value
+     references a canon token — never a raw hex/oklch here. ── */
+  --background: var(--color-warm-white);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface-white);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-surface-white);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-brand-amber);
+  --primary-foreground: var(--color-text-primary);
+  --secondary: var(--color-trust-surface);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-trust-surface);
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-surface-cream);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-cliff-red);
+  --border: var(--color-border-stone);
+  --input: var(--color-border-stone);
+  --ring: var(--color-brand-amber);
+  --radius: 0.75rem;
+
+  /* Layout rhythm — chrome and content share one container so wide screens
+     read as a composed page, not a floating tool. */
+  --container: 1288px;
+  --header-height: 64px;
+}
+
+/* Make CliffCheck tokens available as Tailwind 4 utility colours. */
+@theme inline {
+  --color-warm-white: var(--color-warm-white);
+  --color-surface-white: var(--color-surface-white);
+  --color-surface-cream: var(--color-surface-cream);
+  --color-trust-surface: var(--color-trust-surface);
+  --color-border-stone: var(--color-border-stone);
+  --color-brand-amber: var(--color-brand-amber);
+  --color-cta-hover-amber: var(--color-cta-hover-amber);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-safe-green: var(--color-safe-green);
+  --color-cliff-red: var(--color-cliff-red);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* Guard against any single wide child forcing a horizontal scrollbar on
+     narrow phones. Use `clip`, not `hidden`: `hidden` creates a scroll
+     container that would break `position: sticky` on the output column. */
+  overflow-x: clip;
+}
+
+body {
+  background-color: var(--color-warm-white);
+  /* Round-2 definition: the page carries a SUSTAINED warm cream wash (deeper at
+     the top, settling to a persistent tint) so white cards visibly lift off the
+     page instead of dissolving into near-white. Within-palette (a mix of two
+     canon tokens), never decorative colour. */
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-surface-cream) 88%, var(--color-warm-white)),
+    color-mix(in srgb, var(--color-surface-cream) 46%, var(--color-warm-white)) 640px
+  );
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Money values align in columns and read accurately (DESIGN.md). */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus everywhere — amber ring, never blue (DESIGN.md).
+   Lives in @layer base so shadcn controls (which carry their own amber ring
+   via `outline-none` + `focus-visible:ring`) can override it without doubling. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-brand-amber);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ── Shared chrome ──────────────────────────────────────────────────────────
+   One container width for header, content, and footer — the chrome-to-content
+   rhythm that makes wide screens read as a designed page. */
+
+/* Header: sticky on desktop (the trust pill rides along). On phones it is
+   STATIC — it shows on first paint (trust promise on first paint, DESIGN.md)
+   then scrolls away so the compact answer bar (below) owns the top edge.
+   Positioning lives here, not inline, so the media query can flip it. */
+.cc-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+@media (max-width: 919px) {
+  .cc-header {
+    position: static;
+  }
+}
+
+/* Compact answer bar (phones only) — the fix for the mobile scroll loop.
+   Fixed to the top edge, shows the live delta while the hero band is off
+   screen, so moving a slider ALWAYS shows the number changing. Hidden on
+   desktop (the sticky output column already guarantees visibility there).
+   Slides in with transform/opacity only (reduced-motion safety net applies). */
+.cc-answer-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 56px;
+  padding: 6px var(--space-md);
+  background-color: var(--color-surface-white);
+  border-bottom: 1.5px solid var(--color-border-strong);
+  box-shadow: var(--elevation-raised);
+  transform: translateY(-105%);
+  opacity: 0;
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    opacity var(--motion-base) var(--ease-out);
+}
+.cc-answer-bar[data-show="true"] {
+  transform: translateY(0);
+  opacity: 1;
+}
+@media (min-width: 920px) {
+  .cc-answer-bar {
+    display: none;
+  }
+}
+.cc-container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
+@media (min-width: 768px) {
+  .cc-container {
+    padding-inline: var(--space-lg);
+  }
+}
+
+/* Header nav is desktop-only; the footer repeats the links for phones. */
+.cc-nav {
+  display: none;
+}
+@media (min-width: 820px) {
+  .cc-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+}
+/* Trust pill copy: full sentence on wide, two words on phones. */
+.cc-trust-long {
+  display: none;
+}
+@media (min-width: 600px) {
+  .cc-trust-long {
+    display: inline;
+  }
+  .cc-trust-short {
+    display: none;
+  }
+}
+
+/* Footer link columns collapse to one column on phones. */
+.cc-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+}
+@media (min-width: 768px) {
+  .cc-footer-grid {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: var(--space-xxl);
+  }
+}
+.cc-footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+@media (min-width: 768px) {
+  .cc-footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* Chrome interactive hover/press (DESIGN-DIRECTION.md §9 micro-interactions).
+   Inline styles can't express :hover, so the chrome's interactive links own
+   their hover here. Amber accent on hover, never a fill. Transitions are
+   neutralised under reduced-motion by the safety net below. */
+.cc-header-link:hover,
+.cc-footer-link:hover {
+  color: var(--color-text-primary);
+}
+.cc-footer-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* PAPI badge lifts on hover by deepening its warm fill (no layout animation). */
+.cc-papi-badge:hover {
+  background-color: var(--color-chart-transition-fill);
+}
+
+/* Marketing asymmetric two-column (DESIGN-DIRECTION.md §5). Single column on
+   375px; widens to text + visual on md+. Inline styles can't express the media
+   query, so the landing's feature/proof blocks opt in via this class. The
+   visual sits slightly wider than the prose for an asymmetric composition. */
+.cc-two-col {
+  display: grid;
+  gap: clamp(24px, 5vw, 56px);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .cc-two-col {
+    grid-template-columns: 1fr 1.15fr;
+  }
+  .cc-two-col-reverse {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+/* ── Tool layout — the calculator IS the page ───────────────────────────────
+   Dense financial tool, not a landing page. Two panes on desktop: the inputs
+   scroll on the left; the answer band + chart are STICKY on the right so the
+   impact of any lever (even deep in the advanced levers) stays in view while
+   the user scrolls the inputs. On mobile everything stacks with the answer band
+   first, so the number is the first thing seen. */
+
+/* Answer band — one dense row: the big cost/gain number leads, the from→to
+   totals + safe exit sit beside it. No empty middle. */
+.cc-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+/* Supporting-metric rail: a 3-row grid (labels / values / notes). Each metric
+   is `display: contents` so its three lines drop into the shared rows — labels
+   align on the top row, values share one baseline, notes share the bottom row.
+   Even columns, so it reads as one engineered row, not three stacks of
+   different heights. Column count is driven by data-cols (2 without a cliff,
+   3 with a safe exit). */
+.cc-hero-rail {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: baseline;
+  row-gap: 4px;
+  column-gap: var(--space-lg);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-stone);
+}
+.cc-hero-metric {
+  display: contents;
+}
+/* Mobile: the 3-across metric rail overflows narrow phones (Safe exit runs off
+   the edge). Stack into a 2-column grid; each metric becomes its own block
+   (label over value) so nothing clips. */
+@media (max-width: 559px) {
+  .cc-hero-rail {
+    grid-auto-flow: row;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-md);
+    row-gap: var(--space-sm);
+    align-items: start;
+  }
+  .cc-hero-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+}
+@media (min-width: 920px) {
+  /* Wide: the cost number on the left, the supporting rail on the right,
+     divided by a hairline. Tight, no dead middle. */
+  .cc-hero {
+    grid-template-columns: auto 1fr;
+    gap: clamp(20px, 2.5vw, 40px);
+    align-items: center;
+  }
+  .cc-hero-rail {
+    padding-top: 0;
+    padding-left: clamp(20px, 2.5vw, 40px);
+    border-top: none;
+    border-left: 1px solid var(--color-border-stone);
+  }
+}
+
+/* Two-pane working area. Round-2: mobile is its OWN layout, not a stacked
+   mirror of desktop. On phones the rail/output wrappers dissolve
+   (display: contents) and the five tool cards interleave into one designed
+   column via order — answer → income sliders → chart → situation → dual
+   income — so the interactive core (sliders) sits directly under the answer.
+   On desktop the wrappers are real again: inputs left, sticky output right. */
+.cc-tool {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+.cc-tool-rail,
+.cc-tool-out {
+  display: contents;
+}
+/* Mobile reading order for the tool cards (wrappers are display: contents,
+   so these order within the single-column .cc-tool grid). */
+.cc-ord-hero { order: 1; }
+.cc-ord-sliders { order: 2; }
+.cc-ord-chart { order: 3; }
+.cc-ord-situation { order: 4; }
+.cc-ord-dual { order: 5; }
+@media (min-width: 920px) {
+  .cc-tool {
+    grid-template-columns: minmax(320px, 372px) minmax(0, 1fr);
+    gap: clamp(20px, 2.5vw, 36px);
+  }
+  /* The wrappers become real columns. Inside each, source order is already
+     the desktop order (rail: sliders, situation, dual; out: hero, chart), and
+     the mobile order values sort identically within each flex container. */
+  .cc-tool-rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+  /* The OUTPUT sticks — the answer band + chart stay visible while the inputs
+     scroll, so changing any lever always updates something on screen. */
+  .cc-tool-out {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-width: 0;
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-md));
+  }
+}
+
+/* Detail below the tool: the itemised breakdown + provenance on one side, the
+   manager brief (the act-on-it artifact) on the other. A two-column band that
+   fills the tool's width on desktop — no orphaned centre column — stacking to
+   one column on phones. `.cc-detail-full` rows (tip jar) span both columns. */
+.cc-detail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+.cc-detail-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+}
+@media (min-width: 920px) {
+  .cc-detail {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .cc-detail-full {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Chart canvas. On mobile it keeps a legible 16:10 aspect. On desktop it's
+   capped so the answer band + chart together fit inside one viewport (the whole
+   point of the sticky output column), while staying tall enough to read the
+   cliff. */
+.cc-chart-canvas {
+  width: 100%;
+  /* Taller on phones so the cliff drop reads at 375px — the chart is the
+     "oh shit" moment, it must not be a squat strip. */
+  aspect-ratio: 4 / 3;
+}
+@media (min-width: 560px) {
+  .cc-chart-canvas {
+    aspect-ratio: 16 / 10;
+  }
+}
+@media (min-width: 920px) {
+  .cc-chart-canvas {
+    aspect-ratio: auto;
+    height: clamp(320px, calc(100vh - 400px), 500px);
+  }
+}
+
+/* Reduced-motion safety net (DESIGN-DIRECTION.md §9). Any transform/animation a
+   component adds is neutralised here for users who ask for less motion — they
+   fall back to instant/opacity-only. Components also gate their own transforms,
+   but this guarantees the contract globally. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* No .dark theme on purpose — CliffCheck is intentionally warm-light only
+   (PRODUCT.md accessibility notes). */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}

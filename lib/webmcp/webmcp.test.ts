@@ -17,7 +17,6 @@ const signal = new AbortController().signal;
 const run = (t: WebMcpTool, args: Record<string, unknown>) => t.execute(args, { signal });
 
 afterEach(() => {
-  // @ts-expect-error test cleanup
   delete document.modelContext;
 });
 
@@ -29,7 +28,6 @@ describe("registerCliffCheckTools", () => {
 
   it("registers all four tools with the WebMCP API and returns an AbortController", async () => {
     const registerTool = vi.fn().mockResolvedValue(undefined);
-    // @ts-expect-error partial stub is enough for the adapter
     document.modelContext = { registerTool };
 
     const controller = registerCliffCheckTools();

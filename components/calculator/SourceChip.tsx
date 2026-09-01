@@ -11,10 +11,12 @@ import Link from "next/link";
 import type { Source } from "@/lib/engine";
 
 /**
- * Short human date ("6 Jul 2026") from the latest source `retrieved` date across
- * a state's sources. Kept local so this client component stays dependency-free
- * (imports only the Source type), mirroring lib/seo/states.ts freshnessLabel —
- * the same rationale states.ts gives for its own local fmtMoney.
+ * Month + year ("Jul 2026") of the latest source `retrieved` date across a
+ * state's sources. Benefit rules are set per fiscal year, so the useful
+ * freshness unit is the month a source was last checked, not the exact day —
+ * a day-precise stamp just reads as stale two months on. Kept local so this
+ * client component stays dependency-free (imports only the Source type),
+ * mirroring lib/seo/states.ts freshnessLabel.
  */
 function freshnessFromSources(sources: Source[]): string | null {
   const dates = sources
@@ -25,7 +27,6 @@ function freshnessFromSources(sources: Source[]): string | null {
   const d = new Date(`${dates[dates.length - 1]}T00:00:00`);
   if (Number.isNaN(d.getTime())) return null;
   return d.toLocaleDateString("en-US", {
-    day: "numeric",
     month: "short",
     year: "numeric",
   });
@@ -80,7 +81,7 @@ export function ConfidenceBadge({ sources }: { sources: Source[] }) {
               backgroundColor: "var(--color-safe-green)",
             }}
           />
-          Data checked {checked}
+          FY2026 data &middot; sources checked {checked}
         </span>
       )}
       <p
